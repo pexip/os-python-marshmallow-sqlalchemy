@@ -1,0 +1,30 @@
+Source: python-marshmallow-sqlalchemy
+Section: python
+Priority: optional
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Uploaders: Utkarsh Gupta <guptautkarsh2102@gmail.com>,
+           Emmanuel Arias <eamanu@yaerobi.com>,
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3-all,
+               python3-marshmallow,
+               python3-packaging,
+               python3-pytest <!nocheck>,
+               python3-pytest-lazy-fixture <!nocheck>,
+               python3-setuptools,
+               python3-sqlalchemy,
+Standards-Version: 4.6.2
+Vcs-Browser: https://salsa.debian.org/python-team/packages/python-marshmallow-sqlalchemy
+Vcs-Git: https://salsa.debian.org/python-team/packages/python-marshmallow-sqlalchemy.git
+Homepage: https://marshmallow-sqlalchemy.readthedocs.io/en/latest/
+Rules-Requires-Root: no
+
+Package: python3-marshmallow-sqlalchemy
+Architecture: all
+Depends: ${misc:Depends},
+         ${python3:Depends},
+Description: SQLAlchemy integration with marshmallow
+ SQLAlchemy integration with the marshmallow (de)serialization library.
+ .
+ It allows one to declare your models, generate marshmallow schemas, and
+ (de)serialize your data.

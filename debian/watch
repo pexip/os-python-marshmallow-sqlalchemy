@@ -1,0 +1,2 @@
+version=4
+https://github.com/marshmallow-code/marshmallow-sqlalchemy/tags (?:.*?/)?(\d.*)\.tar\.gz

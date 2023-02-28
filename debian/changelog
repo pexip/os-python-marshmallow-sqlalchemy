@@ -1,0 +1,80 @@
+python-marshmallow-sqlalchemy (0.29.0-1) unstable; urgency=medium
+
+  * Team upload
+  * d/gbp.conf: Add some more defaults
+  * New upstream version 0.29.0
+  * d/control: Bump Standards-Version to 4.6.2
+    No further changes needed.
+
+ -- Carsten Schoenert <c.schoenert@t-online.de>  Tue, 28 Feb 2023 18:08:03 +0100
+
+python-marshmallow-sqlalchemy (0.28.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * d/control: Bump Standards-Version to 4.6.1.1 (from 4.6.1; no further
+    changes).
+  * d/control: Remove trivial autopkgtest-pkg-python.
+  * d/control: Add python3-packaging as Build-Depends.
+
+ -- Emmanuel Arias <eamanu@yaerobi.com>  Mon, 12 Sep 2022 07:00:32 +0000
+
+python-marshmallow-sqlalchemy (0.28.0-1) unstable; urgency=medium
+
+  [ Emmanuel Arias ]
+  * New upstream version.
+  * d/copyright: Update Copyright of the upstream files.
+
+  [ Jeroen Ploemen ]
+  * Control: bump Standards-Version to 4.6.1 (from 4.6.0; no further
+    changes).
+
+ -- Emmanuel Arias <eamanu@yaerobi.com>  Fri, 13 May 2022 06:36:22 +0000
+
+python-marshmallow-sqlalchemy (0.26.1-1) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/control: Update Maintainer field with new Debian Python Team
+    contact address.
+  * d/control: Update Vcs-* fields with new Debian Python Team Salsa
+    layout.
+
+  [ Debian Janitor ]
+  * Remove obsolete field Name from debian/upstream/metadata (already
+    present in machine-readable debian/copyright).
+
+  [ Emmanuel Arias ]
+  * d/tests: uses pyversions -s instead of -i parameter to test supported
+    Python versions.
+  * d/control: add python3-pytest-lazy-fixture dependency.
+  * wrap-and-sort
+  * New upstream version 0.26.1 (Closes: #989270) which includes:
+    - Fix call deprecated attribute 'Binary' of sqlalchemy (Closes: #997465).
+  * d/control: Bump debhelper-compat to 13.
+  * d/control: Bump Standards-Version to 4.6.0.1.
+  * d/gbp.conf: set debian/master as default branch according to DEP-14.
+  * d/docs: Add AUTHORS.rst and CONTRIBUTING.rst.
+  * d/control: add nocheck profile to b-deps used in tests.
+  * d/copyright: update upstream copyright.
+
+ -- Emmanuel Arias <eamanu@yaerobi.com>  Sat, 13 Nov 2021 06:46:16 +0000
+
+python-marshmallow-sqlalchemy (0.19.0-1) unstable; urgency=medium
+
+  * New upstream version 0.19.0
+  * Fix d/watch
+
+ -- Utkarsh Gupta <guptautkarsh2102@gmail.com>  Tue, 29 Oct 2019 12:22:17 +0530
+
+python-marshmallow-sqlalchemy (0.17.0-2) unstable; urgency=medium
+
+  * Reupload to unstable
+  * Run wrap-and-sort
+  * Bump Standards-Version to 4.4.1
+
+ -- Utkarsh Gupta <guptautkarsh2102@gmail.com>  Thu, 17 Oct 2019 22:40:31 +0530
+
+python-marshmallow-sqlalchemy (0.17.0-1) experimental; urgency=medium
+
+  * Initial release (Closes: #934312)
+
+ -- Utkarsh Gupta <guptautkarsh2102@gmail.com>  Fri, 09 Aug 2019 16:54:46 +0530
