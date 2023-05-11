@@ -1,0 +1,29 @@
+--- a/setup.py
++++ b/setup.py
+@@ -5,7 +5,6 @@ from setuptools import find_packages, se
+ INSTALL_REQUIRES = (
+     "marshmallow>=3.0.0",
+     "SQLAlchemy>=1.4.40,<3.0",
+-    "packaging>=21.3",
+ )
+ EXTRAS_REQUIRE = {
+     "tests": [
+--- a/src/marshmallow_sqlalchemy/convert.py
++++ b/src/marshmallow_sqlalchemy/convert.py
+@@ -5,7 +5,6 @@ import warnings
+ import uuid
+ import marshmallow as ma
+ from marshmallow import validate, fields
+-from packaging.version import Version
+ from sqlalchemy.dialects import postgresql, mysql, mssql
+ from sqlalchemy.orm import SynonymProperty
+ import sqlalchemy as sa
+@@ -14,7 +13,7 @@ from .exceptions import ModelConversionE
+ from .fields import Related, RelatedList
+ 
+ 
+-_META_KWARGS_DEPRECATED = Version(ma.__version__) >= Version("3.10.0")
++_META_KWARGS_DEPRECATED = True
+ 
+ 
+ def _is_field(value):
