@@ -20,7 +20,7 @@ EXTRAS_REQUIRE = {
     "docs": [
         "sphinx==6.1.3",
         "alabaster==0.7.13",
-        "sphinx-issues==3.0.1",
+        "sphinx-issues==4.0.0",
     ],
 }
 EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["lint"] + ["tox"]
