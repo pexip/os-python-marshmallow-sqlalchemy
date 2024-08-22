@@ -1,0 +1,23 @@
+From: Emmanuel Arias <eamanu@debian.org>
+Date: Sun, 4 Feb 2024 17:47:15 -0300
+Subject: Pin number version in documentation
+
+Currently the docs/conf.py use importlib.metadata.version() to get the
+version. This patch point the version fixed.
+---
+ docs/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index f963616..22d3cb0 100755
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -26,7 +26,7 @@ master_doc = "index"
+ project = "marshmallow-sqlalchemy"
+ copyright = "Steven Loria and contributors"
+ 
+-version = release = importlib.metadata.version("marshmallow-sqlalchemy")
++version = release = u'1.0.0'
+ 
+ exclude_patterns = ["_build"]
+ 

@@ -1,7 +1,22 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
 
-# output every command that modifies files on the build system.
 #export DH_VERBOSE = 1
 
+include /usr/share/dpkg/pkg-info.mk
+
+BUILD_DATE  = $(shell LC_ALL=C date -u "+%d %B %Y" -d "@$(SOURCE_DATE_EPOCH)")
+SPHINXOPTS := -E -N -D html_last_updated_fmt="$(BUILD_DATE)"
+
+export PYBUILD_NAME=marshmallow_sqlalchemy
+export PYBUILD_SYSTEM=pyproject
+
 %:
-	dh $@ --buildsystem=pybuild --with python3
+	dh $@ --buildsystem=pybuild
+
+override_dh_sphinxdoc:
+ifeq (,$(findstring nodoc, $(DEB_BUILD_OPTIONS)))
+	PYTHONPATH=. \
+	    python3 -m sphinx -b html $(SPHINXOPTS) docs $(CURDIR)/debian/python-marshmallow-sqlalchemy-doc/usr/share/doc/python-marshmallow-sqlalchemy-doc/html
+	dh_sphinxdoc
+endif

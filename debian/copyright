@@ -3,11 +3,13 @@ Upstream-Name: marshmallow-sqlalchemy
 Source: https://github.com/marshmallow-code/marshmallow-sqlalchemy
 
 Files: *
-Copyright: 2015-2022, Steven Loria and contributors
+Copyright: 2015-2024, Steven Loria and contributors
 License: Expat
 
 Files: debian/*
 Copyright: 2019, Utkarsh Gupta <guptautkarsh2102@gmail.com>
+ 2022-2024, Carsten Schoenert <c.schoenert@t-online.de>
+ 2024 Arias Emmanuel <eamanu@debian.org>
 License: Expat
 
 License: Expat

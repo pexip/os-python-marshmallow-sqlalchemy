@@ -1,0 +1,9 @@
+Document: python-marshmallow-sqlalchemy-doc
+Title: SQLAlchemy integration with marshmallow
+Author: Contributors to marshmallow-sqlalchemy
+Abstract: This documentation gives an introduction to use the marshmallow-sqlalchemy bindings.
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/python-marshmallow-sqlalchemy-doc/html/index.html
+Files: /usr/share/doc/python-marshmallow-sqlalchemy-doc/html/*.html
