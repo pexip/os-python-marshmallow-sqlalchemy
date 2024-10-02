@@ -19,7 +19,7 @@ Build-Depends:
  python3-marshmallow-doc <!nodoc>,
  python3-packaging,
  python3-pytest <!nocheck>,
- python3-pytest-lazy-fixtures <!nocheck>,
+ python3-pytest-lazy-fixture <!nocheck>,
  python3-sphinx <!nodoc>,
  python3-sphinx-issues <!nodoc>,
  python3-sqlalchemy <!nocheck>,
