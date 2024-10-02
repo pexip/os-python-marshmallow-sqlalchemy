@@ -1,6 +1,7 @@
 python-marshmallow-sqlalchemy (1.1.0-1+pexip24u1) pexip; urgency=medium
 
   * New upstream version
+  * Remove packaging patch
 
  -- Huw Jones <huw@pexip.com>  Wed, 02 Oct 2024 11:16:30 +0100
 
