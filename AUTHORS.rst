@@ -44,3 +44,6 @@ Contributors
 - Jeppe Fihl-Pearson  `@Tenzer <https://github.com/Tenzer>`_
 - Indivar  `@indiVar0508 <https://github.com/indiVar0508>`_
 - David Doyon  `@ddoyon92 <https://github.com/ddoyon92>`_
+- Hippolyte Henry `@zippolyte <https://github.com/zippolyte>`_
+- Alexandre Detiste tchet@debian.org
+- PandaByte `@panda-byte <https://github.com/panda-byte>`_

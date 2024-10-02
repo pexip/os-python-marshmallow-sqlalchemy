@@ -2,7 +2,7 @@
 marshmallow-sqlalchemy
 **********************
 
-|pypi-package| |build-status| |docs| |marshmallow3| |black|
+|pypi-package| |build-status| |docs| |marshmallow3|
 
 Homepage: https://marshmallow-sqlalchemy.readthedocs.io/
 
@@ -119,7 +119,7 @@ Get it now
    pip install -U marshmallow-sqlalchemy
 
 
-Requires Python >= 3.7, marshmallow >= 3.0.0, and SQLAlchemy >= 1.3.0.
+Requires Python >= 3.8, marshmallow >= 3.18.0, and SQLAlchemy >= 1.4.40.
 
 Documentation
 =============
@@ -153,6 +153,3 @@ MIT licensed. See the bundled `LICENSE <https://github.com/marshmallow-code/mars
 .. |marshmallow3| image:: https://badgen.net/badge/marshmallow/3
     :target: https://marshmallow.readthedocs.io/en/latest/upgrading.html
     :alt: marshmallow 3 compatible
-.. |black| image:: https://badgen.net/badge/code%20style/black/000
-    :target: https://github.com/ambv/black
-    :alt: code style: black
