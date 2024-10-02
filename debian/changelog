@@ -1,3 +1,77 @@
+python-marshmallow-sqlalchemy (1.1.0-1) unstable; urgency=medium
+
+  * New upstream version.
+  * d/patches/lazy_fixtures: Remove patch, it was already applied for
+    upstream.
+
+ -- Emmanuel Arias <eamanu@debian.org>  Thu, 22 Aug 2024 06:56:28 -0300
+
+python-marshmallow-sqlalchemy (1.0.0-3) unstable; urgency=medium
+
+  * Team upload
+  * Fix for new version of pytest-lazy-fixtures
+
+ -- Julian Gilbey <jdg@debian.org>  Fri, 09 Aug 2024 09:06:40 +0100
+
+python-marshmallow-sqlalchemy (1.0.0-2) unstable; urgency=medium
+
+  * Team upload
+  * Replace unmaintained lazy-fixture by lazy-fixtures
+
+ -- Alexandre Detiste <tchet@debian.org>  Tue, 14 May 2024 09:57:25 +0200
+
+python-marshmallow-sqlalchemy (1.0.0-1) unstable; urgency=medium
+
+  * New upstream version.
+  * d/control: Update my contact information in Uploaders.
+  * d/patches: Remove
+    docs-conf.py-Do-not-embed-build-year-in-documentation.patch and update
+    docs-Don-t-use-external-intersphinx.patch.
+  * d/control: Add flit as Build Depends. Remove python3-setuptools it is
+    not longer needed.
+  * d/patches/Pin-number-version-in-documentation.patch: Add patch to pin the
+    version in docs/conf.py. It used the importlib.metadata.version() method
+    to get the documentation version.
+  * d/copyright: Add me in debian/* copyright.
+
+ -- Emmanuel Arias <eamanu@debian.org>  Sun, 04 Feb 2024 17:05:32 -0300
+
+python-marshmallow-sqlalchemy (0.30.0-1) unstable; urgency=medium
+
+  * Team upload
+  * [98ce789] d/watch: Move to git mode on GitHub
+  * [b8ff7bb] New upstream version 0.30.0
+  * [5743545] Rebuild patch queue from patch-queue branch
+    Added patch:
+    docs-conf.py-Do-not-embed-build-year-in-documentation.patch
+    (Closes: #1039044)
+  * [928b442] d/control: Switch Homepage field pointing to GitHub
+  * [c9c5d7d] d/copyright: Update year and copyright holder data
+
+ -- Carsten Schoenert <c.schoenert@t-online.de>  Fri, 12 Jan 2024 19:47:29 +0100
+
+python-marshmallow-sqlalchemy (0.29.0-3) unstable; urgency=medium
+
+  * Team upload
+  * Upload to unstable
+
+ -- Carsten Schoenert <c.schoenert@t-online.de>  Fri, 23 Jun 2023 06:59:47 +0200
+
+python-marshmallow-sqlalchemy (0.29.0-2) experimental; urgency=medium
+
+  * Team upload
+  * d/*: d/*: Running wrap-and-sort -ast
+  * d/control: Adjust B-D entries by add more BuildProfileSpecs
+  * d/rules: Drop --with option in default target
+  * Add patch from patch-queue branch
+    Added patch:
+    docs-Don-t-use-external-intersphinx.patch
+  * d/u/metadata: Add FAQ entry
+  * python-marshmallow-sqlalchemy-doc: Add new binary package
+  * d/python-marshmallow-sqlalchemy-doc: Add doc-base sequencer
+
+ -- Carsten Schoenert <c.schoenert@t-online.de>  Mon, 10 Apr 2023 19:46:48 +0200
+
 python-marshmallow-sqlalchemy (0.29.0-1+pexip24u6) pexip-bookworm; urgency=medium
 
   * New versioning scheme

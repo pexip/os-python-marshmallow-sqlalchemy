@@ -1,6 +1,7 @@
 Tests: python3-marshmallow-sqlalchemy
-Depends: python3-all,
-         python3-pytest,
-         python3-pytest-lazy-fixture,
-         @,
+Depends:
+ python3-all,
+ python3-pytest,
+ python3-pytest-lazy-fixtures,
+ @,
 Restrictions: allow-stderr

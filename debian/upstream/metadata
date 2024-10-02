@@ -1,4 +1,5 @@
 Bug-Database: https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues
 Bug-Submit: https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/new
+FAQ: https://marshmallow-sqlalchemy.readthedocs.io/en/latest/
 Repository: https://github.com/marshmallow-code/marshmallow-sqlalchemy.git
 Repository-Browse: https://github.com/marshmallow-code/marshmallow-sqlalchemy

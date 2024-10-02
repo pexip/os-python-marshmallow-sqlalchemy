@@ -1,13 +1,12 @@
-import pytest
-
-from marshmallow import validate, ValidationError, Schema
 import marshmallow
+import pytest
 import sqlalchemy as sa
+from marshmallow import Schema, ValidationError, validate
+from pytest_lazy_fixtures import lf
 
-from marshmallow_sqlalchemy import SQLAlchemySchema, SQLAlchemyAutoSchema, auto_field
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, SQLAlchemySchema, auto_field
 from marshmallow_sqlalchemy.exceptions import IncorrectSchemaTypeError
 from marshmallow_sqlalchemy.fields import Related
-
 
 # -----------------------------------------------------------------------------
 
@@ -127,8 +126,8 @@ def sqla_auto_model_schema_with_fks(models, request):
 @pytest.mark.parametrize(
     "schema",
     (
-        pytest.lazy_fixture("sqla_schema_with_relationships"),
-        pytest.lazy_fixture("sqla_auto_model_schema_with_relationships"),
+        lf("sqla_schema_with_relationships"),
+        lf("sqla_auto_model_schema_with_relationships"),
     ),
 )
 def test_dump_with_relationships(teacher, schema):
@@ -143,8 +142,8 @@ def test_dump_with_relationships(teacher, schema):
 @pytest.mark.parametrize(
     "schema",
     (
-        pytest.lazy_fixture("sqla_schema_with_fks"),
-        pytest.lazy_fixture("sqla_auto_model_schema_with_fks"),
+        lf("sqla_schema_with_fks"),
+        lf("sqla_auto_model_schema_with_fks"),
     ),
 )
 def test_dump_with_foreign_keys(teacher, schema):
@@ -165,10 +164,10 @@ def test_table_schema_dump(teacher, sqla_auto_table_schema):
 @pytest.mark.parametrize(
     "schema",
     (
-        pytest.lazy_fixture("sqla_schema_with_relationships"),
-        pytest.lazy_fixture("sqla_schema_with_fks"),
-        pytest.lazy_fixture("sqla_auto_model_schema"),
-        pytest.lazy_fixture("sqla_auto_table_schema"),
+        lf("sqla_schema_with_relationships"),
+        lf("sqla_schema_with_fks"),
+        lf("sqla_auto_model_schema"),
+        lf("sqla_auto_table_schema"),
     ),
 )
 def test_load(schema):
@@ -219,10 +218,10 @@ class TestLoadInstancePerSchemaInstance:
     @pytest.mark.parametrize(
         "Schema",
         (
-            pytest.lazy_fixture("schema_no_load_instance"),
-            pytest.lazy_fixture("schema_with_load_instance"),
-            pytest.lazy_fixture("auto_schema_no_load_instance"),
-            pytest.lazy_fixture("auto_schema_with_load_instance"),
+            lf("schema_no_load_instance"),
+            lf("schema_with_load_instance"),
+            lf("auto_schema_no_load_instance"),
+            lf("auto_schema_with_load_instance"),
         ),
     )
     def test_toggle_load_instance_per_schema(self, models, Schema):
@@ -248,10 +247,10 @@ class TestLoadInstancePerSchemaInstance:
 @pytest.mark.parametrize(
     "schema",
     (
-        pytest.lazy_fixture("sqla_schema_with_relationships"),
-        pytest.lazy_fixture("sqla_schema_with_fks"),
-        pytest.lazy_fixture("sqla_auto_model_schema"),
-        pytest.lazy_fixture("sqla_auto_table_schema"),
+        lf("sqla_schema_with_relationships"),
+        lf("sqla_schema_with_fks"),
+        lf("sqla_auto_model_schema"),
+        lf("sqla_auto_table_schema"),
     ),
 )
 def test_load_validation_errors(schema):
@@ -375,8 +374,8 @@ class TestAliasing:
     @pytest.mark.parametrize(
         "schema",
         (
-            pytest.lazy_fixture("aliased_schema"),
-            pytest.lazy_fixture("aliased_auto_schema"),
+            lf("aliased_schema"),
+            lf("aliased_auto_schema"),
         ),
     )
     def test_passing_column_name(self, schema, teacher):
@@ -419,8 +418,8 @@ class TestModelInstanceDeserialization:
     @pytest.mark.parametrize(
         "SchemaClass",
         (
-            pytest.lazy_fixture("sqla_schema_class"),
-            pytest.lazy_fixture("sqla_auto_schema_class"),
+            lf("sqla_schema_class"),
+            lf("sqla_auto_schema_class"),
         ),
     )
     def test_load(self, teacher, SchemaClass, models):

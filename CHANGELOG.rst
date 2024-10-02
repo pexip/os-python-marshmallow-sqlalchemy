@@ -1,6 +1,41 @@
 Changelog
 ---------
 
+1.1.0 (2024-08-14)
+++++++++++++++++++
+
+Features:
+
+*  ``sqlalchemy.Enum`` fields generate a corresponding ``marshmallow.fields.Enum`` field
+  (:issue:`485`, :issue:`112`). Thanks :user:`panda-byte` for the PR.
+
+Support:
+
+* Drop support for marshmallow<=3.18.0.
+
+1.0.0 (2024-01-30)
++++++++++++++++++++
+
+* Remove ``__version__`` attribute. Use feature detection or
+  ``importlib.metadata.version("marshmallow-sqlalchemy")`` instead (:pr:`568`).
+* Support marshmallow>=3.10.0 (:pr:`566`).
+* Passing `info={"marshmallow": ...}` to SQLAlchemy columns is removed, as it is redundant with
+  the ``auto_field`` functionality (:pr:`567`).
+* Remove ``packaging`` as a dependency (:pr:`566`).
+* Support Python 3.12.
+
+0.30.0 (2024-01-07)
++++++++++++++++++++
+
+Features:
+
+* Use ``Session.get()`` load instances to improve deserialization performance (:pr:`548`).
+  Thanks :user:`zippolyte` for the PR.
+
+Other changes:
+
+* Drop support for Python 3.7, which is EOL (:pr:`540`).
+
 0.29.0 (2023-02-27)
 +++++++++++++++++++
 

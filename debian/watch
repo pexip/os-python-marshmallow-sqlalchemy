@@ -1,2 +1,9 @@
 version=4
-https://github.com/marshmallow-code/marshmallow-sqlalchemy/tags (?:.*?/)?(\d.*)\.tar\.gz
+
+opts="pgpmode=none, \
+      compression=gz, \
+      mode=git, \
+      uversionmangle=s/(\d)[_\.\-\+]?((RC|rc|pre|dev|beta|alpha)\.?\d*)$/$1~$2/, \
+      dversionmangle=s/\+ds(\.?\d+)?$//" \
+https://github.com/marshmallow-code/marshmallow-sqlalchemy.git \
+      refs/tags/(\d+\.\d+\.\d+)
