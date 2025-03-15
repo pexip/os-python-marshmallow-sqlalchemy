@@ -2,11 +2,12 @@
 marshmallow-sqlalchemy
 **********************
 
-|pypi-package| |build-status| |docs| |marshmallow3|
+|pypi-package| |build-status| |docs| |marshmallow-support|
 
 Homepage: https://marshmallow-sqlalchemy.readthedocs.io/
 
 `SQLAlchemy <http://www.sqlalchemy.org/>`_ integration with the  `marshmallow <https://marshmallow.readthedocs.io/en/latest/>`_ (de)serialization library.
+
 
 Declare your models
 ===================
@@ -14,12 +15,21 @@ Declare your models
 .. code-block:: python
 
     import sqlalchemy as sa
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref
+    from sqlalchemy.orm import (
+        DeclarativeBase,
+        backref,
+        relationship,
+        sessionmaker,
+    )
+
+    from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 
     engine = sa.create_engine("sqlite:///:memory:")
-    session = scoped_session(sessionmaker(bind=engine))
-    Base = declarative_base()
+    Session = sessionmaker(engine)
+
+
+    class Base(DeclarativeBase):
+        pass
 
 
     class Author(Base):
@@ -28,7 +38,7 @@ Declare your models
         name = sa.Column(sa.String, nullable=False)
 
         def __repr__(self):
-            return "<Author(name={self.name!r})>".format(self=self)
+            return f"<Author(name={self.name!r})>"
 
 
     class Book(Base):
@@ -40,6 +50,8 @@ Declare your models
 
 
     Base.metadata.create_all(engine)
+
+.. start elevator-pitch
 
 Generate marshmallow schemas
 ============================
@@ -100,33 +112,39 @@ Make sure to declare `Models` before instantiating `Schemas`. Otherwise `sqlalch
     author = Author(name="Chuck Paluhniuk")
     author_schema = AuthorSchema()
     book = Book(title="Fight Club", author=author)
-    session.add(author)
-    session.add(book)
-    session.commit()
 
-    dump_data = author_schema.dump(author)
-    print(dump_data)
-    # {'id': 1, 'name': 'Chuck Paluhniuk', 'books': [1]}
+    with Session() as session:
+        session.add(author)
+        session.add(book)
+        session.commit()
 
-    load_data = author_schema.load(dump_data, session=session)
-    print(load_data)
-    # <Author(name='Chuck Paluhniuk')>
+        dump_data = author_schema.dump(author)
+        print(dump_data)
+        # {'id': 1, 'name': 'Chuck Paluhniuk', 'books': [1]}
+
+    with Session() as session:
+        load_data = author_schema.load(dump_data, session=session)
+        print(load_data)
+        # <Author(name='Chuck Paluhniuk')>
 
 Get it now
 ==========
-::
 
-   pip install -U marshmallow-sqlalchemy
+.. code-block:: shell-session
+
+   $ pip install -U marshmallow-sqlalchemy
 
 
-Requires Python >= 3.8, marshmallow >= 3.18.0, and SQLAlchemy >= 1.4.40.
+Requires Python >= 3.9, marshmallow >= 3.18.0, and SQLAlchemy >= 1.4.40.
+
+.. end elevator-pitch
 
 Documentation
 =============
 
 Documentation is available at https://marshmallow-sqlalchemy.readthedocs.io/ .
 
-Project Links
+Project links
 =============
 
 - Docs: https://marshmallow-sqlalchemy.readthedocs.io/
@@ -150,6 +168,6 @@ MIT licensed. See the bundled `LICENSE <https://github.com/marshmallow-code/mars
 .. |docs| image:: https://readthedocs.org/projects/marshmallow-sqlalchemy/badge/
    :target: http://marshmallow-sqlalchemy.readthedocs.io/
    :alt: Documentation
-.. |marshmallow3| image:: https://badgen.net/badge/marshmallow/3
+.. |marshmallow-support| image:: https://badgen.net/badge/marshmallow/3,4?list=1
     :target: https://marshmallow.readthedocs.io/en/latest/upgrading.html
-    :alt: marshmallow 3 compatible
+    :alt: marshmallow 3|4 compatible

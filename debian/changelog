@@ -1,3 +1,18 @@
+python-marshmallow-sqlalchemy (1.4.1-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Emmanuel Arias <eamanu@debian.org>  Sat, 15 Mar 2025 18:26:28 -0300
+
+python-marshmallow-sqlalchemy (1.4.0-1) unstable; urgency=medium
+
+  * New upstream version.
+  * d/patches: Update patches according to new upstream release.
+  * d/control: Add python3-sphinx-copybutton, python3-sphinxext-opengraph,
+    python3-sphinx-design and furo as Build Dependencies.
+
+ -- Emmanuel Arias <eamanu@debian.org>  Sat, 25 Jan 2025 19:07:46 -0300
+
 python-marshmallow-sqlalchemy (1.1.0-1) unstable; urgency=medium
 
   * New upstream version.

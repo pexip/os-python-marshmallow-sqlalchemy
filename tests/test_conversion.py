@@ -1,12 +1,14 @@
 import datetime as dt
 import decimal
 import uuid
+from typing import cast
 
 import pytest
 import sqlalchemy as sa
 from marshmallow import Schema, fields, validate
+from sqlalchemy import Integer, String
 from sqlalchemy.dialects import mysql, postgresql
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import Mapped, Session, column_property
 
 from marshmallow_sqlalchemy import (
     ModelConversionError,
@@ -17,6 +19,8 @@ from marshmallow_sqlalchemy import (
     property2field,
 )
 from marshmallow_sqlalchemy.fields import Related, RelatedList
+
+from .conftest import CourseLevel, mapped_column
 
 
 def contains_validator(field, v_type):
@@ -67,31 +71,50 @@ class TestModelFieldConversion:
         fields_ = fields_for_model(models.Student)
         assert fields_["dob"].allow_none is True
 
-    def test_sets_enum_choices(self, models):
+    def test_enum_with_choices_converted_to_field_with_validator(self, models):
         fields_ = fields_for_model(models.Course)
         validator = contains_validator(fields_["level"], validate.OneOf)
         assert validator
         assert list(validator.choices) == ["Primary", "Secondary"]
 
-    def test_sets_enum_with_class_choices(self, models):
+    def test_enum_with_class_converted_to_enum_field(self, models):
         fields_ = fields_for_model(models.Course)
-        validator = contains_validator(fields_["level_with_enum_class"], validate.OneOf)
-        assert validator
-        assert list(validator.choices) == ["PRIMARY", "SECONDARY"]
+        field = fields_["level_with_enum_class"]
+        assert type(field) is fields.Enum
+        assert contains_validator(field, validate.OneOf) is False
+        assert field.enum is CourseLevel
 
     def test_many_to_many_relationship(self, models):
         student_fields = fields_for_model(models.Student, include_relationships=True)
-        assert type(student_fields["courses"]) is RelatedList
+        courses_field = student_fields["courses"]
+        assert type(courses_field) is RelatedList
+        assert courses_field.required is False
 
         course_fields = fields_for_model(models.Course, include_relationships=True)
-        assert type(course_fields["students"]) is RelatedList
+        students_field = course_fields["students"]
+        assert type(students_field) is RelatedList
+        assert students_field.required is False
 
     def test_many_to_one_relationship(self, models):
         student_fields = fields_for_model(models.Student, include_relationships=True)
-        assert type(student_fields["current_school"]) is Related
+        current_school_field = student_fields["current_school"]
+        assert type(current_school_field) is Related
+        assert current_school_field.allow_none is False
+        assert current_school_field.required is True
 
         school_fields = fields_for_model(models.School, include_relationships=True)
         assert type(school_fields["students"]) is RelatedList
+
+        teacher_fields = fields_for_model(models.Teacher, include_relationships=True)
+        current_school_field = teacher_fields["current_school"]
+        assert type(current_school_field) is Related
+        assert current_school_field.required is False
+
+    def test_many_to_many_uselist_false_relationship(self, models):
+        teacher_fields = fields_for_model(models.Teacher, include_relationships=True)
+        substitute_field = teacher_fields["substitute"]
+        assert type(substitute_field) is Related
+        assert substitute_field.required is False
 
     def test_include_fk(self, models):
         student_fields = fields_for_model(models.Student, include_fk=False)
@@ -116,7 +139,7 @@ class TestModelFieldConversion:
         assert "title" in fields
         assert "name" not in fields
 
-    def test_subquery_proxies(self, session, Base, models):
+    def test_subquery_proxies(self, session: Session, Base: type, models):
         # Model from a subquery, columns are proxied.
         # https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/383
         first_graders = session.query(models.Student).filter(
@@ -135,7 +158,7 @@ def make_property(*column_args, **column_kwargs):
 
 
 class TestPropertyFieldConversion:
-    @pytest.fixture()
+    @pytest.fixture
     def converter(self):
         return ModelConverter()
 
@@ -161,7 +184,6 @@ class TestPropertyFieldConversion:
             (sa.Text, fields.Str),
             (sa.Date, fields.Date),
             (sa.DateTime, fields.DateTime),
-            (sa.Boolean, fields.Bool),
             (sa.Boolean, fields.Bool),
             (sa.Float, fields.Float),
             (sa.SmallInteger, fields.Int),
@@ -202,6 +224,46 @@ class TestPropertyFieldConversion:
         assert type(field) is fields.List
         inner_field = getattr(field, "inner", getattr(field, "container", None))
         assert type(inner_field) is fields.Int
+
+    @pytest.mark.parametrize(
+        "array_property",
+        (
+            pytest.param(make_property(sa.ARRAY(sa.Enum(CourseLevel))), id="sa.ARRAY"),
+            pytest.param(
+                make_property(postgresql.ARRAY(sa.Enum(CourseLevel))),
+                id="postgresql.ARRAY",
+            ),
+        ),
+    )
+    def test_convert_ARRAY_Enum(self, converter, array_property):
+        field = converter.property2field(array_property)
+        assert type(field) is fields.List
+        inner_field = field.inner
+        assert type(inner_field) is fields.Enum
+
+    @pytest.mark.parametrize(
+        "array_property",
+        (
+            pytest.param(
+                make_property(sa.ARRAY(sa.Float, dimensions=2)), id="sa.ARRAY"
+            ),
+            pytest.param(
+                make_property(postgresql.ARRAY(sa.Float, dimensions=2)),
+                id="postgresql.ARRAY",
+            ),
+        ),
+    )
+    def test_convert_multidimensional_ARRAY(self, converter, array_property):
+        field = converter.property2field(array_property)
+        assert type(field) is fields.List
+        assert type(field.inner) is fields.List
+        assert type(field.inner.inner) is fields.Float
+
+    def test_convert_one_dimensional_ARRAY(self, converter):
+        prop = make_property(postgresql.ARRAY(sa.Float, dimensions=1))
+        field = converter.property2field(prop)
+        assert type(field) is fields.List
+        assert type(field.inner) is fields.Float
 
     def test_convert_TSVECTOR(self, converter):
         prop = make_property(postgresql.TSVECTOR)
@@ -256,7 +318,9 @@ class TestPropToFieldClass:
 
     def test_can_pass_extra_kwargs(self):
         prop = make_property(sa.String())
-        field = property2field(prop, instance=True, description="just a string")
+        field = property2field(
+            prop, instance=True, metadata=dict(description="just a string")
+        )
         assert field.metadata["description"] == "just a string"
 
 
@@ -272,7 +336,9 @@ class TestColumnToFieldClass:
 
     def test_can_pass_extra_kwargs(self):
         column = sa.Column(sa.String(255))
-        field = column2field(column, instance=True, description="just a string")
+        field = column2field(
+            column, instance=True, metadata=dict(description="just a string")
+        )
         assert field.metadata["description"] == "just a string"
 
     def test_uuid_column2field(self):
@@ -291,11 +357,11 @@ class TestColumnToFieldClass:
 
 
 class TestFieldFor:
-    def test_field_for(self, models, session):
+    def test_field_for(self, models):
         field = field_for(models.Student, "full_name")
         assert type(field) is fields.Str
 
-        field = field_for(models.Student, "current_school", session=session)
+        field = field_for(models.Student, "current_school")
         assert type(field) is Related
 
         field = field_for(models.Student, "full_name", field_class=fields.Date)
@@ -306,7 +372,7 @@ class TestFieldFor:
             DeprecationWarning,
             match="column` parameter is deprecated and will be removed in future releases. Use `columns` instead.",
         ):
-            Related(column=[])
+            Related(column="TestCol")
 
     def test_related_initialization_with_columns(self, models, session):
         ret = Related(columns=["TestCol"])
@@ -322,48 +388,19 @@ class TestFieldFor:
             models.Student, "full_name", validate=[validate.Length(max=20)]
         )
         assert len(field.validators) == 1
-        assert field.validators[0].max == 20
+        validator = cast(validate.Length, field.validators[0])
+        assert validator.max == 20
 
         field = field_for(models.Student, "full_name", validate=[])
         assert field.validators == []
 
-    def tests_postgresql_array_with_args(self, Base):
+    def tests_postgresql_array_with_args(self, Base: type):
         # regression test for #392
-        from sqlalchemy import Column, Integer, String
-        from sqlalchemy.dialects.postgresql import ARRAY
-
         class ModelWithArray(Base):
             __tablename__ = "model_with_array"
-            id = Column(Integer, primary_key=True)
-            bar = Column(ARRAY(String))
+            id: Mapped[int] = mapped_column(Integer, primary_key=True)
+            bar: Mapped[list[str]] = mapped_column(postgresql.ARRAY(String))
 
         field = field_for(ModelWithArray, "bar", dump_only=True)
         assert type(field) is fields.List
         assert field.dump_only is True
-
-
-def _repr_validator_list(validators):
-    return sorted(repr(validator) for validator in validators)
-
-
-@pytest.mark.parametrize(
-    "defaults,new,expected",
-    [
-        ([validate.Length()], [], [validate.Length()]),
-        (
-            [validate.Range(max=100), validate.Length(min=3)],
-            [validate.Range(max=1000)],
-            [validate.Range(max=1000), validate.Length(min=3)],
-        ),
-        (
-            [validate.Range(max=1000)],
-            [validate.Length(min=3)],
-            [validate.Range(max=1000), validate.Length(min=3)],
-        ),
-        ([], [validate.Length(min=3)], [validate.Length(min=3)]),
-    ],
-)
-def test_merge_validators(defaults, new, expected):
-    converter = ModelConverter()
-    validators = converter._merge_validators(defaults, new)
-    assert _repr_validator_list(validators) == _repr_validator_list(expected)

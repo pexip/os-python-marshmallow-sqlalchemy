@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import datetime as dt
+from dataclasses import dataclass
 from enum import Enum
-from types import SimpleNamespace
+from typing import Any
 
 import pytest
 import sqlalchemy as sa
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import (
+    DeclarativeMeta,
+    Mapped,
     backref,
     column_property,
     declarative_base,
@@ -14,11 +19,15 @@ from sqlalchemy.orm import (
     synonym,
 )
 
+mapped_column: Any
+try:
+    from sqlalchemy.orm import mapped_column
+except ImportError:  # compat with sqlalchemy<2
+    mapped_column = sa.Column
+
 
 class AnotherInteger(sa.Integer):
     """Use me to test if MRO works like we want"""
-
-    pass
 
 
 class AnotherText(sa.types.TypeDecorator):
@@ -27,46 +36,66 @@ class AnotherText(sa.types.TypeDecorator):
     impl = sa.UnicodeText
 
 
-@pytest.fixture()
-def Base():
+@pytest.fixture
+def Base() -> type:
     return declarative_base()
 
 
-@pytest.fixture()
+@pytest.fixture
 def engine():
-    return sa.create_engine("sqlite:///:memory:", echo=False, future=True)
+    engine = sa.create_engine("sqlite:///:memory:", echo=False, future=True)
+    yield engine
+    engine.dispose()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(Base, models, engine):
     Session = sessionmaker(bind=engine)
     Base.metadata.create_all(bind=engine)
-    return Session(future=True)
+    with Session() as session:
+        yield session
 
 
-@pytest.fixture()
-def models(Base):
+CourseLevel = Enum("CourseLevel", "PRIMARY SECONDARY")
+
+
+@dataclass
+class Models:
+    Course: type[DeclarativeMeta]
+    School: type[DeclarativeMeta]
+    Student: type[DeclarativeMeta]
+    Teacher: type[DeclarativeMeta]
+    SubstituteTeacher: type[DeclarativeMeta]
+    Paper: type[DeclarativeMeta]
+    GradedPaper: type[DeclarativeMeta]
+    Seminar: type[DeclarativeMeta]
+    Lecture: type[DeclarativeMeta]
+    Keyword: type[DeclarativeMeta]
+
+
+@pytest.fixture
+def models(Base: type) -> Models:
     # models adapted from https://github.com/wtforms/wtforms-sqlalchemy/blob/master/tests/tests.py
     student_course = sa.Table(
         "student_course",
-        Base.metadata,
+        Base.metadata,  # type: ignore[attr-defined]
         sa.Column("student_id", sa.Integer, sa.ForeignKey("student.id")),
         sa.Column("course_id", sa.Integer, sa.ForeignKey("course.id")),
     )
 
     class Course(Base):
         __tablename__ = "course"
-        id = sa.Column(sa.Integer, primary_key=True)
-        name = sa.Column(sa.String(255), nullable=False)
+        id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
+        name: Mapped[str] = mapped_column(sa.String(255), nullable=False)
         # These are for better model form testing
-        cost = sa.Column(sa.Numeric(5, 2), nullable=False)
-        description = sa.Column(sa.Text, nullable=True)
-        level = sa.Column(sa.Enum("Primary", "Secondary"))
-        level_with_enum_class = sa.Column(sa.Enum(Enum("Level", "PRIMARY SECONDARY")))
-        has_prereqs = sa.Column(sa.Boolean, nullable=False)
-        started = sa.Column(sa.DateTime, nullable=False)
-        grade = sa.Column(AnotherInteger, nullable=False)
-        transcription = sa.Column(AnotherText, nullable=False)
+        cost: Mapped[float] = mapped_column(sa.Numeric(5, 2), nullable=False)
+        description: Mapped[str] = mapped_column(sa.Text, nullable=True)
+        level: Mapped[CourseLevel] = mapped_column(sa.Enum("Primary", "Secondary"))
+        level_with_enum_class: Mapped[CourseLevel] = mapped_column(sa.Enum(CourseLevel))
+        has_prereqs: Mapped[bool] = mapped_column(sa.Boolean, nullable=False)
+        started: Mapped[dt.datetime] = mapped_column(sa.DateTime, nullable=False)
+        grade: Mapped[int] = mapped_column(AnotherInteger, nullable=False)
+        transcription: Mapped[str] = mapped_column(AnotherText, nullable=False)
 
         @property
         def url(self):
@@ -135,6 +164,8 @@ def models(Base):
 
         substitute = relationship("SubstituteTeacher", uselist=False, backref="teacher")
 
+        data = sa.Column(sa.PickleType)
+
         @property
         def fname(self):
             return self.full_name
@@ -171,7 +202,7 @@ def models(Base):
 
     lecturekeywords_table = sa.Table(
         "lecturekeywords",
-        Base.metadata,
+        Base.metadata,  # type: ignore[attr-defined]
         sa.Column("keyword_id", sa.Integer, sa.ForeignKey("keyword.id")),
         sa.Column("lecture_id", sa.Integer, sa.ForeignKey("lecture.id")),
     )
@@ -203,7 +234,7 @@ def models(Base):
             "kw", "keyword", creator=lambda kw: Keyword(keyword=kw)
         )
 
-    return SimpleNamespace(
+    return Models(
         Course=Course,
         School=School,
         Student=Student,
