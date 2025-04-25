@@ -1,17 +1,100 @@
 Changelog
 ---------
 
+1.4.1 (2025-02-10)
+++++++++++++++++++
+
+Bug fixes:
+
+* Fix inheritance of declared fields that match then name of a foreign key column
+  when the ``include_fk`` option is set to ``False`` (:pr:`657`).
+  Thanks :user:`carterjc` for the PR.
+
+1.4.0 (2025-01-19)
+++++++++++++++++++
+
+Bug fixes:
+
+* Fix handling of arrays of enums and multidimensional arrays (:issue:`653`).
+  Thanks :user:`carterjc` for reporting and investigating the fix.
+* Fix handling of `sqlalchemy.PickleType` columns (:issue:`394`)
+  Thanks :user:`Eyon42` for reporting.
+
+Other changes:
+
+* Passing arbitrary keyword arguments to `auto_field <marshmallow_sqlalchemy.auto_field>`
+  is no longer supported (:pr:`647`). Use the ``metadata`` argument to pass metadata
+  to the generated field instead.
+
+.. code-block:: python
+
+    # Before
+    auto_field(description="The name of the artist")
+    # On marshmallow 3, this raises a warning: "RemovedInMarshmallow4Warning: Passing field metadata as keyword arguments is deprecated."
+    # On marshmallow 4, this raises an error: "TypeError: Field.__init__() got an unexpected keyword argument 'description'"
+
+    # After
+    auto_field(metadata=dict(description="The name of the artist"))
+
+1.3.0 (2025-01-11)
+++++++++++++++++++
+
+Features:
+
+* Typing: Add type annotations to `fields <marshmallow_sqlalchemy.fields>`.
+
+Bug fixes:
+
+* Fix auto-generation of `marshmallow.fields.Enum` field from `sqlalchemy.Enum` columns (:issue:`615`).
+  Thanks :user:`joaquimvl` for reporting.
+* Fix behavior of ``include_fk = False`` in options when parent
+  schema sets ``include_fk = True`` (:issue:`440`).
+  Thanks :user:`uhnomoli` for reporting.
+* Fields generated from non-nullable `sqlalchemy.orm.relationship`
+  correctly set ``required=True`` and ``allow_none=False`` (:issue:`336`, :issue:`163`).
+  Thanks :user:`AbdealiLoKo` for reporting.
+
+Other changes:
+
+* Docs: Add more documentation for `marshmallow_sqlalchemy.fields.Related` (:issue:`162`).
+  Thanks :user:`GabrielC101` for the suggestion.
+* Docs: Document methods of `SQLAlchemySchema <marshmallow_sqalalchemy.SQLAlchemySchema>`
+  and `SQLAlchemyAutoSchema <marshmallow_sqalchemy.SQLAlchemyAutoSchema>` (:issue:`619`).
+* Docs: Various documentation improvements (:pr:`635`, :pr:`636`, :pr:`639`, :pr:`641`, :pr:`642`).
+
+1.2.0 (2025-01-09)
+++++++++++++++++++
+
+Features:
+
+* Typing: Improve type coverage (:pr:`631`, :pr:`632`, :pr:`634`).
+
+Other changes:
+
+* Drop support for Python 3.8, which is EOL. Support Python 3.9-3.13.
+
+1.1.1 (2025-01-06)
+++++++++++++++++++
+
+Bug fixes:
+
+* Fix compatibility with marshmallow 3.24.0 and 4.0.0 (:pr:`628`).
+
+Other changes:
+
+* Test against Python 3.13 (:issue:`629`).
+
 1.1.0 (2024-08-14)
 ++++++++++++++++++
 
 Features:
 
-*  ``sqlalchemy.Enum`` fields generate a corresponding ``marshmallow.fields.Enum`` field
-  (:issue:`485`, :issue:`112`). Thanks :user:`panda-byte` for the PR.
+* ``sqlalchemy.Enum`` fields generate a corresponding ``marshmallow.fields.Enum`` field (:issue:`485`, :issue:`112`). 
+  Thanks :user:`panda-byte` for the PR.
 
 Support:
 
-* Drop support for marshmallow<=3.18.0.
+* Drop support for marshmallow<3.18.0.
 
 1.0.0 (2024-01-30)
 +++++++++++++++++++
@@ -75,7 +158,7 @@ Other changes:
 Bug fixes:
 
 * Address ``DeprecationWarning`` re: usage of ``distutils`` (:pr:`435`).
- Thanks :user:`Tenzer` for the PR.
+  Thanks :user:`Tenzer` for the PR.
 
 0.28.0 (2022-03-09)
 +++++++++++++++++++
@@ -108,7 +191,7 @@ Other changes:
 Bug fixes:
 
 * Fix generating fields for ``postgreql.ARRAY`` columns (:issue:`392`).
- Thanks :user:`mjpieters` for the catch and patch.
+  Thanks :user:`mjpieters` for the catch and patch.
 
 0.26.0 (2021-05-26)
 +++++++++++++++++++
