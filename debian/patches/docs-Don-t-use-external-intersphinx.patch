@@ -9,7 +9,7 @@ Forwarded: Not-Needed
 
 --- a/docs/conf.py
 +++ b/docs/conf.py
-@@ -14,9 +14,9 @@
+@@ -15,9 +15,9 @@
  default_role = "py:obj"
  
  intersphinx_mapping = {

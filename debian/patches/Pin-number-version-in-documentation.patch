@@ -8,13 +8,11 @@ version. This patch point the version fixed.
  docs/conf.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/conf.py b/docs/conf.py
-index f963616..22d3cb0 100755
 --- a/docs/conf.py
 +++ b/docs/conf.py
-@@ -26,7 +26,7 @@ master_doc = "index"
+@@ -28,7 +28,7 @@
  project = "marshmallow-sqlalchemy"
- copyright = "Steven Loria and contributors"
+ copyright = "Steven Loria and contributors"  # noqa: A001
  
 -version = release = importlib.metadata.version("marshmallow-sqlalchemy")
 +version = release = u'1.0.0'

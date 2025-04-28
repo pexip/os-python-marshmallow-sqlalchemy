@@ -15,13 +15,17 @@ Build-Depends:
  python-sqlalchemy-doc <!nodoc>,
  python3-all,
  python3-doc <!nodoc>,
+ furo <!nodoc>,
  python3-marshmallow <!nocheck>,
  python3-marshmallow-doc <!nodoc>,
  python3-packaging,
  python3-pytest <!nocheck>,
  python3-pytest-lazy-fixture <!nocheck>,
  python3-sphinx <!nodoc>,
+ python3-sphinx-copybutton <!nodoc>,
+ python3-sphinx-design <!nodoc>,
  python3-sphinx-issues <!nodoc>,
+ python3-sphinxext-opengraph <!nodoc>,
  python3-sqlalchemy <!nocheck>,
 Standards-Version: 4.7.0
 Vcs-Browser: https://salsa.debian.org/python-team/packages/python-marshmallow-sqlalchemy

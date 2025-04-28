@@ -1,7 +1,11 @@
+from __future__ import annotations
+
+from importlib.metadata import version
+
 import marshmallow
 import pytest
 import sqlalchemy as sa
-from marshmallow import Schema, ValidationError, validate
+from marshmallow import Schema, ValidationError, fields, validate
 from pytest_lazy_fixtures import lf
 
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, SQLAlchemySchema, auto_field
@@ -43,8 +47,8 @@ class EntityMixin:
 
 
 @pytest.fixture
-def sqla_auto_model_schema(models, request):
-    class TeacherSchema(SQLAlchemyAutoSchema):
+def sqla_auto_model_schema(models, request) -> SQLAlchemyAutoSchema:
+    class TeacherSchema(SQLAlchemyAutoSchema[models.Teacher]):
         class Meta:
             model = models.Teacher
 
@@ -54,7 +58,7 @@ def sqla_auto_model_schema(models, request):
 
 
 @pytest.fixture
-def sqla_auto_table_schema(models, request):
+def sqla_auto_table_schema(models, request) -> SQLAlchemyAutoSchema:
     class TeacherSchema(SQLAlchemyAutoSchema):
         class Meta:
             table = models.Teacher.__table__
@@ -68,21 +72,22 @@ def sqla_auto_table_schema(models, request):
 
 
 @pytest.fixture
-def sqla_schema_with_relationships(models, request):
-    class TeacherSchema(EntityMixin, SQLAlchemySchema):
+def sqla_schema_with_relationships(models, request) -> SQLAlchemySchema:
+    class TeacherSchema(EntityMixin, SQLAlchemySchema[models.Teacher]):
         class Meta:
             model = models.Teacher
 
         full_name = auto_field(validate=validate.Length(max=20))
         current_school = auto_field()
         substitute = auto_field()
+        data = auto_field()
 
     return TeacherSchema()
 
 
 @pytest.fixture
-def sqla_auto_model_schema_with_relationships(models, request):
-    class TeacherSchema(SQLAlchemyAutoSchema):
+def sqla_auto_model_schema_with_relationships(models, request) -> SQLAlchemyAutoSchema:
+    class TeacherSchema(SQLAlchemyAutoSchema[models.Teacher]):
         class Meta:
             model = models.Teacher
             include_relationships = True
@@ -96,20 +101,21 @@ def sqla_auto_model_schema_with_relationships(models, request):
 
 
 @pytest.fixture
-def sqla_schema_with_fks(models, request):
-    class TeacherSchema(EntityMixin, SQLAlchemySchema):
+def sqla_schema_with_fks(models, request) -> SQLAlchemySchema:
+    class TeacherSchema(EntityMixin, SQLAlchemySchema[models.Teacher]):
         class Meta:
             model = models.Teacher
 
         full_name = auto_field(validate=validate.Length(max=20))
         current_school_id = auto_field()
+        data = auto_field()
 
     return TeacherSchema()
 
 
 @pytest.fixture
-def sqla_auto_model_schema_with_fks(models, request):
-    class TeacherSchema(SQLAlchemyAutoSchema):
+def sqla_auto_model_schema_with_fks(models, request) -> SQLAlchemyAutoSchema:
+    class TeacherSchema(SQLAlchemyAutoSchema[models.Teacher]):
         class Meta:
             model = models.Teacher
             include_fk = True
@@ -136,6 +142,7 @@ def test_dump_with_relationships(teacher, schema):
         "full_name": teacher.full_name,
         "current_school": 42,
         "substitute": None,
+        "data": None,
     }
 
 
@@ -151,6 +158,7 @@ def test_dump_with_foreign_keys(teacher, schema):
         "id": teacher.id,
         "full_name": teacher.full_name,
         "current_school_id": 42,
+        "data": None,
     }
 
 
@@ -158,6 +166,7 @@ def test_table_schema_dump(teacher, sqla_auto_table_schema):
     assert sqla_auto_table_schema.dump(teacher) == {
         "id": teacher.id,
         "full_name": teacher.full_name,
+        "data": None,
     }
 
 
@@ -177,7 +186,7 @@ def test_load(schema):
 class TestLoadInstancePerSchemaInstance:
     @pytest.fixture
     def schema_no_load_instance(self, models, session):
-        class TeacherSchema(SQLAlchemySchema):
+        class TeacherSchema(SQLAlchemySchema[models.Teacher]):  # type: ignore[name-defined]
             class Meta:
                 model = models.Teacher
                 sqla_session = session
@@ -190,16 +199,16 @@ class TestLoadInstancePerSchemaInstance:
         return TeacherSchema
 
     @pytest.fixture
-    def schema_with_load_instance(self, schema_no_load_instance):
+    def schema_with_load_instance(self, schema_no_load_instance: type):
         class TeacherSchema(schema_no_load_instance):
-            class Meta(schema_no_load_instance.Meta):
+            class Meta(schema_no_load_instance.Meta):  # type: ignore[name-defined]
                 load_instance = True
 
         return TeacherSchema
 
     @pytest.fixture
     def auto_schema_no_load_instance(self, models, session):
-        class TeacherSchema(SQLAlchemyAutoSchema):
+        class TeacherSchema(SQLAlchemyAutoSchema[models.Teacher]):  # type: ignore[name-defined]
             class Meta:
                 model = models.Teacher
                 sqla_session = session
@@ -208,9 +217,9 @@ class TestLoadInstancePerSchemaInstance:
         return TeacherSchema
 
     @pytest.fixture
-    def auto_schema_with_load_instance(self, auto_schema_no_load_instance):
+    def auto_schema_with_load_instance(self, auto_schema_no_load_instance: type):
         class TeacherSchema(auto_schema_no_load_instance):
-            class Meta(auto_schema_no_load_instance.Meta):
+            class Meta(auto_schema_no_load_instance.Meta):  # type: ignore[name-defined]
                 load_instance = True
 
         return TeacherSchema
@@ -293,7 +302,7 @@ def test_passing_table_to_auto_field(models, teacher):
 
 # https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/190
 def test_auto_schema_skips_synonyms(models):
-    class TeacherSchema(SQLAlchemyAutoSchema):
+    class TeacherSchema(SQLAlchemyAutoSchema[models.Teacher]):  # type: ignore[name-defined]
         class Meta:
             model = models.Teacher
             include_fk = True
@@ -318,7 +327,7 @@ def test_auto_field_works_with_synonym(models):
 
 # Regresion test https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/306
 def test_auto_field_works_with_ordered_flag(models):
-    class StudentSchema(SQLAlchemyAutoSchema):
+    class StudentSchema(SQLAlchemyAutoSchema[models.Student]):  # type: ignore[name-defined]
         class Meta:
             model = models.Student
             ordered = True
@@ -471,6 +480,7 @@ def test_related_when_model_attribute_name_distinct_from_column_name(
     dump_data = TeacherSchema().dump(teacher)
     assert "school_id" not in dump_data["current_school"]
     assert dump_data["current_school"]["id"] == teacher.current_school.id
+    assert dump_data["current_school"]["name"] == teacher.current_school.name
     new_teacher = TeacherSchema().load(dump_data, transient=True)
     assert new_teacher.current_school.id == teacher.current_school.id
     assert TeacherSchema().load(dump_data) is teacher
@@ -555,3 +565,188 @@ def test_dump_and_load_with_assoc_proxy_multiplicity_load_only_only_kwargs(
         {"student_identifiers": list(school.student_ids)}, transient=True
     )
     assert list(new_school.student_ids) == list(school.student_ids)
+
+
+# https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/440
+def test_auto_schema_with_model_allows_subclasses_to_override_include_fk(models):
+    class TeacherSchema(SQLAlchemyAutoSchema):
+        inherited_field = fields.String()
+
+        class Meta:
+            model = models.Teacher
+            include_fk = True
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+    class TeacherNoFkSchema(TeacherSchema):
+        class Meta(TeacherSchema.Meta):
+            include_fk = False
+
+    schema2 = TeacherNoFkSchema()
+    assert "id" in schema2.fields
+    assert "inherited_field" in schema2.fields
+    assert "current_school_id" not in schema2.fields
+
+
+def test_auto_schema_with_model_allows_subclasses_to_override_exclude(models):
+    class TeacherSchema(SQLAlchemyAutoSchema):
+        inherited_field = fields.String()
+
+        class Meta:
+            model = models.Teacher
+            include_fk = True
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+    class TeacherNoFkSchema(TeacherSchema):
+        class Meta(TeacherSchema.Meta):
+            exclude = ("current_school_id",)
+
+    schema2 = TeacherNoFkSchema()
+    assert "id" in schema2.fields
+    assert "inherited_field" in schema2.fields
+    assert "current_school_id" not in schema2.fields
+
+
+def test_auto_schema_with_model_allows_subclasses_to_override_include_fk_with_explicit_field(
+    models,
+):
+    class TeacherSchema(SQLAlchemyAutoSchema):
+        inherited_field = fields.String()
+
+        class Meta:
+            model = models.Teacher
+            include_fk = True
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+    class TeacherNoFkSchema(TeacherSchema):
+        current_school_id = fields.Integer()
+
+        class Meta(TeacherSchema.Meta):
+            include_fk = False
+
+    schema2 = TeacherNoFkSchema()
+    assert "id" in schema2.fields
+    assert "inherited_field" in schema2.fields
+    assert "current_school_id" in schema2.fields
+
+
+def test_auto_schema_with_table_allows_subclasses_to_override_include_fk(models):
+    class TeacherSchema(SQLAlchemyAutoSchema):
+        inherited_field = fields.Integer()
+
+        class Meta:
+            table = models.Teacher.__table__
+            include_fk = True
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+    class TeacherNoFkSchema(TeacherSchema):
+        class Meta(TeacherSchema.Meta):
+            include_fk = False
+
+    schema2 = TeacherNoFkSchema()
+    assert "id" in schema2.fields
+    assert "inherited_field" in schema2.fields
+    assert "current_school_id" not in schema2.fields
+
+
+def test_auto_schema_with_table_allows_subclasses_to_override_include_fk_with_explicit_field(
+    models,
+):
+    class TeacherSchema(SQLAlchemyAutoSchema):
+        inherited_field = fields.Integer()
+
+        class Meta:
+            table = models.Teacher.__table__
+            include_fk = True
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+    class TeacherNoFkModelSchema(TeacherSchema):
+        current_school_id = fields.Integer()
+
+        class Meta(TeacherSchema.Meta):
+            include_fk = False
+
+    schema2 = TeacherNoFkModelSchema()
+    assert "id" in schema2.fields
+    assert "inherited_field" in schema2.fields
+    assert "current_school_id" in schema2.fields
+
+
+def test_auto_schema_with_model_can_inherit_declared_field_for_foreign_key_column_when_include_fk_is_false(
+    models,
+):
+    class BaseTeacherSchema(Schema):
+        current_school_id = fields.Integer()
+
+    class TeacherSchema(BaseTeacherSchema, SQLAlchemyAutoSchema):
+        class Meta:
+            model = models.Teacher
+            include_fk = False
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+
+def test_auto_schema_with_table_can_inherit_declared_field_for_foreign_key_column_when_include_fk_is_false(
+    models,
+):
+    class BaseTeacherSchema(Schema):
+        current_school_id = fields.Integer()
+
+    class TeacherSchema(BaseTeacherSchema, SQLAlchemyAutoSchema):
+        class Meta:
+            table = models.Teacher.__table__
+            include_fk = False
+
+    schema = TeacherSchema()
+    assert "current_school_id" in schema.fields
+
+
+def test_auto_field_does_not_accept_arbitrary_kwargs(models):
+    if int(version("marshmallow")[0]) < 4:
+        from marshmallow.warnings import RemovedInMarshmallow4Warning
+
+        with pytest.warns(
+            RemovedInMarshmallow4Warning,
+            match="Passing field metadata as keyword arguments is deprecated",
+        ):
+
+            class CourseSchema(SQLAlchemyAutoSchema):
+                class Meta:
+                    model = models.Course
+
+                name = auto_field(description="A course name")
+
+    else:
+        with pytest.raises(TypeError, match="unexpected keyword argument"):
+
+            class CourseSchema(SQLAlchemyAutoSchema):  # type: ignore[no-redef]
+                class Meta:
+                    model = models.Course
+
+                name = auto_field(description="A course name")
+
+
+# https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/394
+def test_dumping_pickle_field(models, teacher):
+    class TeacherSchema(SQLAlchemySchema):
+        class Meta:
+            model = models.Teacher
+
+        data = auto_field()
+
+    teacher.data = {"foo": "bar"}
+
+    schema = TeacherSchema()
+    assert schema.dump(teacher) == {
+        "data": {"foo": "bar"},
+    }
